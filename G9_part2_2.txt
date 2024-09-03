@@ -1,0 +1,53 @@
+(the server code)
+import socket
+
+server_port = 1690
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server_socket.bind(('', server_port))
+print("Server is ready")
+
+clients = {}
+client_counter = 1
+
+while True:
+    # Receive message from any client
+    message, client_address = server_socket.recvfrom(2048)
+    message = message.decode()
+
+    #  unique num to each client
+    if client_address not in clients:
+        client_name = "client-> " +str(client_counter)
+        clients[client_address] = client_name
+        client_counter += 1
+
+    # Print the received message with the unique client name
+    print("Message from "+clients[client_address]+": "+ message)
+
+    # back the message to the client 
+    print("enter yor message to "+clients[client_address]+": ")
+    response = input()
+    server_socket.sendto(response.encode(), client_address)
+
+
+
+(the client code)
+import socket
+
+# Set up the client's connection details
+server_ip = "localhost"  
+server_port = 1690
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+while True:
+    # Input the message that the client wants to send
+    message = input("Enter your message: ")
+    
+    # Send the message to the server
+    client_socket.sendto(message.encode(), (server_ip, server_port))
+    
+    # Receive the server's response
+    response, _ = client_socket.recvfrom(2048)
+    print("server response:",response.decode())
+
+ 
